@@ -1,7 +1,8 @@
 close all
 clear all
 
-startdir = 'C:\olivia\data\savings chapter';
+%startdir = 'C:\olivia\data\savings chapter';
+startdir = 'C:\Users\kimol\Documents\MATLAB';
 cd(startdir)
 
 load('190920_compiledTrialsForSavingsChapter.mat')
@@ -14,10 +15,32 @@ daydat.cradjamp = [];
 daydat.crprob = [];
 daydat.sesstype = {};
 
+block20dat.mouse = {};
+block20dat.day = [];
+block20dat.cradjamp = [];
+block20dat.crprob = [];
+block20dat.sesstype = [];
+
+block10dat.mouse = {};
+block10dat.day = [];
+block10dat.cradjamp = [];
+block10dat.crprob = [];
+block10dat.sesstype = [];
+
+starthere = 1;
+
 for m = 1:length(mousearray)
     
-    mouseidx = strfind(dat.mouse, mousearray(m,1).name);
-    mouseidx = find(cell2mat(mouseidx));
+    mouseidx = [];
+    while strcmpi(dat.mouse{starthere}, mousearray(m,1).name)
+        mouseidx = [mouseidx;starthere];
+        starthere = starthere+1;
+        if starthere > length(dat.mouse)
+            break
+        end
+    end
+%     mouseidx = strfind(dat.mouse, mousearray(m,1).name);
+%     mouseidx = find(cell2mat(mouseidx));
     
     eyelidpos = dat.eyelidpos(mouseidx,:);
     mouse = dat.mouse{mouseidx};
@@ -45,7 +68,7 @@ for m = 1:length(mousearray)
         tdlasdel = lasdel(dayidx,:);
         tdstable = stable(dayidx,:);
         tdcradjamp = cradjamp(dayidx,:);
-        
+       
         numtrials = sum(tdstable & tdcsdur>0);
         numcrs = sum(tdstable & tdcsdur>0 & tdcradjamp>=0.1);
         crprob = numcrs./numtrials;
@@ -56,7 +79,11 @@ for m = 1:length(mousearray)
         daydat.cradjamp = [daydat.cradjamp; meancradjamp];
         daydat.crprob = [daydat.crprob; crprob];
         
-        if sum(tdcsdur>0 & tdusdur>0)>0
+        if strcmpi(mousearray(m,1).name, 'OK007') && days(d) == 150402
+            sesstype = 'extinction'; % see notes; basically there was a problem with neuroblinks that day so I unplugged the puffer to get extinction trials
+        elseif  strcmpi(mousearray(m,1).name, 'OK008') && days(d) == 150402
+            sesstype = 'extinction'; % see notes; basically there was a problem with neuroblinks that day so I unplugged the puffer to get extinction trial
+        elseif sum(tdcsdur>0 & tdusdur>0)>0
             sesstype = 'training';
         elseif sum(tdcsdur>0 & tdusdur>0)==0
             sesstype = 'extinction';
@@ -64,9 +91,30 @@ for m = 1:length(mousearray)
         
         daydat.sesstype = [daydat.sesstype; sesstype];
         
+        %% get blocked data
+        
+        % block 20
+        cstrials = 
+        blockbeg = 1;
+        blockend = 20;
+        for b = 1:5
+            addme = (b-1)*20;
+            tbbeg = blockbeg + addme;
+            tbend = blockend + addme;
+            if b == 5
+                tbend = length(
+            end
+        end
+        
+        % block 10
+        
         clear numtrials numcrs crprob meancradjamp tdeyelidpos tdcsdur...
             tdusdur tdisi tdlasdur tdlasfreq tdlasdel tdstable tdcradjamp...
-            sesstype
+            sesstype mouseidx
     end
     
 end
+
+save('190920_compiledForSavingsChapter_dayData.mat', 'daydat')
+
+

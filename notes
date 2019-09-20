@@ -1,0 +1,3 @@
+OK007 and OK008 150402 have positive US durations saved in the trialdata and the metadata, but this is incorrect. I took note that I unplugged the puffer to get extinction trials. Apparently the version of the code that Shane had implemented that day to get the lasers working did not permit there to be different puff durations.
+
+exclude OK025-OK028 for the first round of analyses because they are ArchCRH animals
