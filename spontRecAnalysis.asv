@@ -60,8 +60,8 @@ for m = 1:length(mice)
     plot([80.5 80.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
     plot([90.5 90.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
     plot([100.5 100.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
-    xlim([0 length(plotme)+1])
-    ylim([0 1])
+    xlim([0 lebplotme+1])
+    pause
     
     
 end
