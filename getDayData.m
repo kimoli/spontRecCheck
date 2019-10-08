@@ -68,7 +68,11 @@ for m = 1:length(mousearray)
         tdlasdel = lasdel(dayidx,:);
         tdstable = stable(dayidx,:);
         tdcradjamp = cradjamp(dayidx,:);
-       
+%         
+%         if strcmpi(mousearray(m,1).name, 'OK209') && tdusdur(1)==0
+%             pause
+%         end
+%        
         numtrials = sum(tdstable & tdcsdur>0);
         numcrs = sum(tdstable & tdcsdur>0 & tdcradjamp>=0.1);
         crprob = numcrs./numtrials;

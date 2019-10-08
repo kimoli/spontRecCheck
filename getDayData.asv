@@ -19,13 +19,13 @@ block20dat.mouse = {};
 block20dat.day = [];
 block20dat.cradjamp = [];
 block20dat.crprob = [];
-block20dat.sesstype = [];
+block20dat.sesstype = {};
 
 block10dat.mouse = {};
 block10dat.day = [];
 block10dat.cradjamp = [];
 block10dat.crprob = [];
-block10dat.sesstype = [];
+block10dat.sesstype = {};
 
 starthere = 1;
 
@@ -68,6 +68,8 @@ for m = 1:length(mousearray)
         tdlasdel = lasdel(dayidx,:);
         tdstable = stable(dayidx,:);
         tdcradjamp = cradjamp(dayidx,:);
+        
+        if strcmpi(mousearray(m,1).name, 'OK210
        
         numtrials = sum(tdstable & tdcsdur>0);
         numcrs = sum(tdstable & tdcsdur>0 & tdcradjamp>=0.1);
@@ -130,13 +132,62 @@ for m = 1:length(mousearray)
 %             pause
         end
         
-        block20dat.mouse = [block20dat.mouse; mousearray(m,1).name];
-        block20dat.day = [block20dat.day; days(d)];
-        block20dat.cradjamp = [block20dat.cradjamp; blockc];
-        block20dat.crprob = [];
-        block20dat.sesstype = [block20dat.sesstype; sesstype];
+        block20dat.mouse = [block20dat.mouse; mousearray(m,1).name;...
+            mousearray(m,1).name; mousearray(m,1).name;...
+            mousearray(m,1).name; mousearray(m,1).name];
+        block20dat.day = [block20dat.day; days(d)*ones(5,1)];
+        block20dat.cradjamp = [block20dat.cradjamp; blockcradjamp];
+        block20dat.crprob = [block20dat.crprob; blockcrprob];
+        block20dat.sesstype = [block20dat.sesstype; sesstype;...
+            sesstype; sesstype; sesstype; sesstype];
         
         % block 10
+        csidx = tdcsdur>0;
+        checkcr = tdcradjamp(csidx);
+        isstable = tdstable(csidx);
+        blockcradjamp = nan(10,1);
+        blockcrprob = nan(10,1);
+        blockbeg = 1;
+        blockend = 10;
+        for b = 1:10
+            addme = (b-1)*10;
+            tbbeg = blockbeg + addme;
+            tbend = blockend + addme;
+            if b == 6
+                tbend = sum(csidx);
+            elseif tbend > sum(csidx)
+                tbend = sum(csidx);
+                
+%                 tbbeg
+%                 tbend
+%                 pause
+                break
+            end
+            
+            thisblock_amp = checkcr(tbbeg:tbend);
+            thisblock_stable = isstable(tbbeg:tbend);
+            blockcradjamp(b,1) = mean(thisblock_amp(thisblock_stable==1));
+            
+            numtrials = sum(thisblock_stable);
+            goodtrials = sum(thisblock_amp(thisblock_stable==1,1)>=0.1);
+            blockcrprob(b,1) = goodtrials./numtrials;
+            
+%             tbbeg
+%             tbend
+%             pause
+        end
+        
+        block10dat.mouse = [block10dat.mouse; mousearray(m,1).name;...
+            mousearray(m,1).name; mousearray(m,1).name;...
+            mousearray(m,1).name; mousearray(m,1).name;mousearray(m,1).name;...
+            mousearray(m,1).name; mousearray(m,1).name;...
+            mousearray(m,1).name; mousearray(m,1).name];
+        block10dat.day = [block10dat.day; days(d)*ones(10,1)];
+        block10dat.cradjamp = [block10dat.cradjamp; blockcradjamp];
+        block10dat.crprob = [block10dat.crprob; blockcrprob];
+        block10dat.sesstype = [block10dat.sesstype; sesstype;...
+            sesstype; sesstype; sesstype; sesstype;sesstype;...
+            sesstype; sesstype; sesstype; sesstype];
         
         clear numtrials numcrs crprob meancradjamp tdeyelidpos tdcsdur...
             tdusdur tdisi tdlasdur tdlasfreq tdlasdel tdstable tdcradjamp...
@@ -145,6 +196,10 @@ for m = 1:length(mousearray)
     
 end
 
+
 save('190920_compiledForSavingsChapter_dayData.mat', 'daydat')
+save('190920_compiledForSavingsChapter_block20Data.mat', 'block20dat')
+save('190920_compiledForSavingsChapter_block10Data.mat', 'block10dat')
+
 
 
