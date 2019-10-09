@@ -20,6 +20,12 @@ mice = {'OK001';...
     'OK008'};
 
 starthere = 1;
+plotdata.mouse = {};
+plotdata.cradjamp = nan(8,70);
+plotdata.crprob = nan(8,70);
+btwnSessDev.mouse = {};
+btwnSessDev.cradjamp = nan(8,8);
+btwnSessDev.crprob = nan(8,8);
 for m = 1:length(mice)
     
     mouseidx = [];
@@ -30,6 +36,9 @@ for m = 1:length(mice)
             break
         end
     end
+    
+    plotdata.mouse(m,1) = mice(m,1);
+    btwnSessDev.mouse(m,1) = mice(m,1);
     
     day = block10dat.day(mouseidx,1);
     cradjamp = block10dat.cradjamp(mouseidx,1);
@@ -83,6 +92,22 @@ for m = 1:length(mice)
     ylim([0 1])
     ylabel('cradjamp')
     title(mice(m,1))
+    
+    try
+        temp = [plotme_bsln', plotme_ext(1:40)'];
+        temp = [temp, plotme_ext(end-9:end)'];
+    catch ME
+        temp = [plotme_bsln', plotme_ext'];
+    end
+    plotdata.cradjamp(m,1:length(temp)) = temp;
+    
+    btwnSessDev.cradjamp(m,1) = plotme_bsln(11)-plotme_bsln(10);
+    btwnSessDev.cradjamp(m,2) = plotme_ext(1)-plotme_bsln(20);
+    iterspot = 3;
+    for i = 21:10:length(plotme_ext)
+        btwnSessDev.cradjamp(m,iterspot) = plotme_ext(i)-plotme_ext(i-1);
+        iterspot = iterspot + 1;
+    end
     
     if sum(isnan(plotme_ext))>0
         disp('NAN FOUND IN plotme_ext')
@@ -155,6 +180,14 @@ for m = 1:length(mice)
     ylim([0 1])
     ylabel('prob')
     title(mice(m,1))
+    
+    try
+        temp = [plotme_bslnprob', plotme_extprob(1:40)'];
+        temp = [temp, plotme_extprob(end-9:end)'];
+    catch ME
+        temp = [plotme_bslnprob', plotme_extprob'];
+    end
+    plotdata.crprob(m,1:length(temp)) = temp;
     
     if sum(isnan(plotme_extprob))>0
         disp('NAN FOUND IN plotme_ext')
@@ -235,6 +268,34 @@ ylabel('CR Prob Beginning (sess n) - CR Prob End (sess n-1)')
 
 
 [h, p] = ttest([btwnSessDiffs_bslnprob(1,1);btwnSessDiffs_bslnprob(3:end,1)], [btwnSessDiffs_extprob(1,1); btwnSessDiffs_extprob(3:end,1)]);
+
+% plot group performance
+idx = ones(8,1);
+idx(5,1) = 0;
+groupdata = nanmean(plotdata.cradjamp(idx==1,:));
+figure
+scatter(1:70, groupdata)
+hold on
+plot([10.5 10.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([20.5 20.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([30.5 30.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([40.5 40.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([50.5 50.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([60.5 60.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+
+% plot individual animal changes between days
+for i = 1:8
+figure
+scatter(1:8, [btwnSessDev.cradjamp(i,1),nan,btwnSessDev.cradjamp(i,3:end)])
+hold on
+plot([0.5 8.5], [0 0], 'LineStyle', '--', 'Color', [0 0 0])
+ylabel('- consolidation, + spont rec')
+ylim([-0.35 0.35])
+title(btwnSessDev.mouse(i))
+end
+
+figure
+boxplot(btwnSessDev.cradjamp)
 
 
 clear btwnSessDiffs_bslnprob btwnSessDiffs_extprob btwnSessDiffs_bsln btwnSessDiffs_ext
@@ -481,6 +542,12 @@ mice = {'S146';...
     'OK210'};
 
 starthere = 3131; % need to go through the array starting at the index for the first mouse listed. Mouse name list in mice and in the data array ordering must be the same.
+plotdata.mouse = {};
+plotdata.cradjamp = nan(8,70);
+plotdata.crprob = nan(8,70);
+btwnSessDev.mouse = {};
+btwnSessDev.cradjamp = nan(8, 10);
+btwnSessDev.crprob = nan(8, 10);
 for m = 1:length(mice)
     starthereOrig = starthere;
     
@@ -492,6 +559,9 @@ for m = 1:length(mice)
             break
         end
     end
+    
+    plotdata.mouse(m,1) = mice(m,1);
+    btwnSessDev.mouse(m,1) = mice(m,1);
     
     day = block10dat.day(mouseidx,1);
     cradjamp = block10dat.cradjamp(mouseidx,1);
@@ -547,14 +617,25 @@ for m = 1:length(mice)
     ylim([0 1])
     ylabel('cradjamp')
     title(mice(m,1))
-    pause
     
-    if sum(isnan(plotme_ext))>0
-        disp('NAN FOUND IN plotme_ext')
-        pause
-        % pause here to catch any nan's that made it into the extinction dataset. i
-        % don't think there should have been any but just in case
+    temp = [plotme_bsln', plotme_ext(1:40)'];
+    temp = [temp, plotme_ext(end-9:end)'];
+    plotdata.cradjamp(m,1:length(temp)) = temp;
+    
+    btwnSessDev.cradjamp(m,1) = plotme_bsln(11)-plotme_bsln(10);
+    btwnSessDev.cradjamp(m,2) = plotme_ext(1) - plotme_bsln(20);
+    iternum = 3;
+    for i = 21:10:length(plotme_ext)
+        btwnSessDev.cradjamp(m,iternum) = plotme_ext(i) - plotme_ext(i-1);
+        iternum = iternum + 1;
     end
+    
+%     if sum(isnan(plotme_ext))>0
+%         disp('NAN FOUND IN plotme_ext')
+%         pause
+%         % pause here to catch any nan's that made it into the extinction dataset. i
+%         % don't think there should have been any but just in case
+%     end
     
     % there are nans in the final baseline data blocks, maybe due to
     % squinting?
@@ -620,6 +701,18 @@ for m = 1:length(mice)
     ylim([0 1])
     ylabel('prob')
     title(mice(m,1))
+    
+    temp = [plotme_bslnprob', plotme_extprob(1:40)'];
+    temp = [temp, plotme_extprob(end-9:end)'];
+    plotdata.crprob(m,1:length(temp)) = temp;
+    
+    btwnSessDev.crprob(m,1) = plotme_bslnprob(11)-plotme_bslnprob(10);
+    btwnSessDev.crprob(m,2) = plotme_extprob(1) - plotme_bslnprob(20);
+    iternum = 3;
+    for i = 21:10:length(plotme_extprob)
+        btwnSessDev.crprob(m,iternum) = plotme_extprob(i) - plotme_extprob(i-1);
+        iternum = iternum + 1;
+    end
     
 %     if sum(isnan(plotme_extprob))>0
 %         disp('NAN FOUND IN plotme_ext')
@@ -692,14 +785,115 @@ ylabel('CR Amp Beginning (sess n) - CR Amp End (sess n-1)')
 figure
 plot([0 3], [0 0], '--', 'Color', [0.5 0.5 0.5])
 hold on
-boxplot([btwnSessDiffs_bslnprob, btwnSessDiffs_extprob(:,1)])
+%boxplot([btwnSessDiffs_bslnprob, btwnSessDiffs_extprob(:,1)])
 for i = 1:8
     plot([1; 2], [btwnSessDiffs_bslnprob(i,1); btwnSessDiffs_extprob(i,1)], '--o', 'Color', [0 0 0])
 end
 ylabel('CR Prob Beginning (sess n) - CR Prob End (sess n-1)')
+ylim([-1 1])
 
 [h, p] = ttest([btwnSessDiffs_bsln(1,1);btwnSessDiffs_bsln(3:end,1)], [btwnSessDiffs_ext(1,1); btwnSessDiffs_ext(3:end,1)]);
 [h, p] = ttest([btwnSessDiffs_bslnprob(1,1);btwnSessDiffs_bslnprob(3:end,1)], [btwnSessDiffs_extprob(1,1); btwnSessDiffs_extprob(3:end,1)]);
+
+% biggest spontaneous recovery
+figure
+scatter(1:70, plotdata.crprob(2,:))
+hold on
+plot([10.5 10.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([20.5 20.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([30.5 30.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([40.5 40.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([50.5 50.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([60.5 60.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+ylabel('CR Probability')
+title(plotdata.mouse(2,1))
+
+% biggest consolidation
+figure
+scatter(1:70, plotdata.crprob(6,:))
+hold on
+plot([10.5 10.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([20.5 20.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([30.5 30.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([40.5 40.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([50.5 50.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([60.5 60.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+ylabel('CR Probability')
+title(plotdata.mouse(6,1))
+
+% median mouse
+figure
+scatter(1:70, plotdata.crprob(1,:))
+hold on
+plot([10.5 10.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([20.5 20.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([30.5 30.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([40.5 40.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([50.5 50.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([60.5 60.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+ylabel('CR Probability')
+title(plotdata.mouse(1,1))
+
+% plot group performance: cradjamp
+idx = ones(8,1);
+idx(5,1) = 0;
+groupdata = nanmean(plotdata.cradjamp(idx==1,:));
+figure
+scatter(1:70, groupdata)
+hold on
+plot([10.5 10.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([20.5 20.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([30.5 30.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([40.5 40.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([50.5 50.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([60.5 60.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+ylabel('CR Amplitude')
+
+% plot group performance: cr probability
+idx = ones(8,1);
+idx(5,1) = 0;
+groupdata = nanmean(plotdata.crprob(idx==1,:));
+groupsem = nanstd(plotdata.crprob(idx==1,:))./sum(~isnan(plotdata.crprob(idx==1,:)));
+figure
+errorbar([1:length(groupdata)],groupdata, groupsem, '.')
+hold on
+plot([10.5 10.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([20.5 20.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([30.5 30.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([40.5 40.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([50.5 50.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+plot([60.5 60.5], [0 1], 'LineStyle', ':', 'Color', [0 0 0])
+ylabel('CR Probability')
+
+% plot animals changes between days
+figure
+hold on
+for i = 1:size(btwnSessDev.crprob,2)
+    if i ~= 2
+        quantiles = quantile(btwnSessDev.crprob(:,i),3);
+        plot([i-0.25 i+0.25], [quantiles(1) quantiles(1)], 'Color', [0 0 1])
+        plot([i-0.25 i+0.25], [quantiles(3) quantiles(3)], 'Color', [0 0 1])
+        plot([i-0.25 i+0.25], [quantiles(2) quantiles(2)], 'Color', [1 0 0])
+        plot([i-0.25 i-0.25], [quantiles(1) quantiles(3)], 'Color', [0 0 1])
+        plot([i+0.25 i+0.25], [quantiles(1) quantiles(3)], 'Color', [0 0 1])
+        plot([i i], [quantiles(3) max(btwnSessDev.crprob(:,i))], 'Color', [0 0 1])
+        plot([i i], [quantiles(1) min(btwnSessDev.crprob(:,i))], 'Color', [0 0 1])
+    end
+end
+
+% plot individual animal changes between days
+for i = 1:8
+figure
+scatter(1:6, [btwnSessDev.cradjamp(i,1),nan,btwnSessDev.cradjamp(i,3:6)])
+hold on
+plot([0.5 6.5], [0 0], 'LineStyle', '--', 'Color', [0 0 0])
+ylabel('- consolidation, + spont rec')
+ylim([-0.35 0.35])
+title(btwnSessDev.mouse(i))
+end
+
+figure
+boxplot(btwnSessDev.cradjamp)
 
 clear btwnSessDiffs_bslnprob btwnSessDiffs_extprob btwnSessDiffs_bsln btwnSessDiffs_ext
 
